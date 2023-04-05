@@ -1,0 +1,986 @@
+/* C1: Write a program to design LALR parsing using YACC */ 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ARITHMETIC EXPRESSION CHECKER : 
+
+Yacc Program -  sampleyacc.y 
+%{ 
+/* Definition section */ 
+#include<ctype.h> 
+#include<stdio.h> 
+#include<stdlib.h> 
+
+int yylex();
+int yywrap();
+%} 
+
+%token digit 
+%% 
+/* Rule Section */ 
+/*After Evaluating the expression E,S prints correct*/ 
+S   : E {printf("syntax is Correct\n\n");} 
+     ; 
+/*The expression parser uses three different symbols T,F and P, to set the precedence and associativity of operators*/ 
+E  : E '+' T 
+    | E '-' T 
+    | T 
+    ; 
+T  : T '*' P 
+     | T '/' P 
+     | P 
+     ; 
+P  : F '^' P 
+    | F 
+    ; 
+F  : '(' E ')' 
+    | digit 
+    ; 
+%% 
+//driver code
+#include”lex.yy.c” 
+int main() 
+{ 
+printf("Enter infix expression: "); 
+yyparse(); 
+} 
+yyerror() 
+{ 
+printf(" Error\n"); 
+} 
+
+
+
+
+Lex Program    sampleyex.l 
+
+%{ 
+#include "y.tab.h" 
+extern int yylval; 
+%} 
+%% 
+//If the token is an Integer number,then return it's value. 
+[0-9]+ {yylval=atoi(yytext); return digit;} 
+//If the token is space or tab,then just ignore it. 
+[\t] ; 
+//If the token is new line,return 0. 
+[\n] return 0; 
+//For any other token, return the first character read since the last match. 
+. return yytext[0]; 
+%%
+int yywrap()
+{
+return 0;
+}
+
+Compilation
+yacc –d sampleyacc.y
+lex samplelex.l
+gcc y.tab.c 
+./a.out
+ 
+printf("%c",inp[r]); 
+} 
+void rep(char t[],int r) 
+{ 
+char c; 
+c=t[r]; 
+switch(c) 
+{ 
+case 'a':  printf("0"); 
+break; 
+case 'b':  printf("1"); 
+break; 
+case 'c':  printf("2"); 
+break; 
+case 'd':  printf("3"); 
+break; 
+case 'e':  printf("4"); 
+break; 
+case 'f':  printf("5"); 
+break; 
+case 'g':  printf("6"); 
+break; 
+case 'h':  printf("7"); 
+break; 
+case 'm': printf("8"); 
+break; 
+case 'j':  printf("9"); 
+break; 
+case 'k':  printf("10"); 
+break; 
+case 'l':  printf("11"); 
+break; 
+default   :printf("%c",t[r]); 
+break; 
+} 
+} 
+smartworld.asia
+smartzworld.com
+Specworld.in
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CALCULATOR PRG 1
+
+sampleyacc.y
+
+%{ 
+/* Definition section */ 
+   #include<ctype.h> 
+   #include<stdio.h> 
+   #include<stdlib.h> 
+   #include<math.h>
+   
+   int yylex();
+   int yywrap();
+%} 
+%token digit
+
+%% 
+S : E {printf("syntax is Correct %d \n\n",$1);}
+  ;
+E : E '+' T  {$$=$1+$3;}
+  | E '-' T  {$$=$1-$3;}
+  | T
+  ;
+T : T '*' P  {$$=$1*$3;}
+  | T '/' P  {$$=$1/$3;}
+  | P
+  ;
+P : F '^' P  {$$=pow($1,$3);}
+  | F
+  ;
+F : '(' E ')' {$$=$2;}
+  | digit
+  ;
+%%
+#include"lex.yy.c"
+int main()
+{
+printf("Enter infix expression: ");
+yyparse();
+}
+void yyerror()
+{
+printf(" Error in Expression\n");
+}
+
+yacc ñd sampleyacc.y
+lex samplelex.l
+gcc y.tab.c -lm
+./a.out
+
+samplelex.l
+
+%{ 
+   #include "y.tab.h" 
+   extern int yylval; 
+%} 
+%% 
+[0-9]+ {yylval=atoi(yytext); return digit;}
+[\t] ; 
+[\n] return 0;
+.    return yytext[0]; 
+%% 
+int yywrap()
+{
+return 0;
+}
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CALCULATOR PRG 2
+
+<parser.l>
+
+ %{ #include<stdio.h> 
+#include "y.tab.h"
+ %}
+
+ %%
+
+ [0-9]+ {yylval.dval=atof(yytext); return DIGIT; }
+ \n|. return yytext[0]; 
+
+%%
+
+
+ <parser.y> 
+
+%{ /*This YACC specification file generates the LALR parser 
+#include<stdio.h>
+ %} 
+
+%union { double dval; } 
+%token <dval> DIGIT 
+%type <dval> expr
+ %type <dval> term 
+%type <dval> factor 
+%% 
+
+line: expr '\n' { printf("%g\n",$1); } 
+; 
+expr: expr '+' term {$$=$1 + $3 ;}
+ | term 
+; 
+term: term '*' factor {$$=$1 * $3 ;} 
+| factor 
+; factor: '(' expr ')' {$$=$2 ;} 
+| DIGIT 
+; 
+%% 
+int main() { 
+yyparse(); 
+} 
+yyerror(char *s) { 
+printf("%s",s); 
+}
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+s_lex.l
+
+%{
+    #include "y.tab.h"
+    int countn=0;
+%}
+%option yylineno
+alpha [a-zA-Z]
+digit [0-9]
+unary "++"|"--"
+%%
+"printf"                    { return PRINTF; }
+"scanf"                     { return SCANF; }
+"int"                       { return INT; }
+"float"                     { return FLOAT; }
+"char"                      { return CHAR; }
+"void"                      { return VOID; }
+"return"                    { return RETURN; }
+"for"	                    { return FOR; }
+"if"	                    { return IF; }
+"else"	                    { return ELSE; }
+"#include"[ ]*<.+\.h>      { return INCLUDE; }
+"true"                      { return TRUE; }
+"false"                     { return FALSE; }
+[-]?{digit}+                { return NUMBER; }
+[-]?{digit}+\.{digit}{1,6}  { return FLOAT_NUM; }
+{alpha}({alpha}|{digit})*   { return ID; }
+{unary}                     { return UNARY; }
+"<="                        { return LE; }
+">="                        { return GE; }
+"=="                        { return EQ; }
+"!="                        { return NE; }
+">"	                    { return GT; }
+"<"	                    { return LT; }
+"&&"	                    { return AND; }
+"||"	                    { return OR; }
+"+"                         { return ADD; }
+"-"                         { return SUBTRACT; }
+"/"                         { return DIVIDE; }
+"*"                         { return MULTIPLY; }
+\/\/.*                      { ; }
+\/\*(.*\n)*.*\*\/           { ; } 
+[ \t]*                      { ; }
+[\n]                        { countn++; }
+.	                    { return *yytext; }
+["].*["]                    { return STR; }
+['].[']                     { return CHARACTER; }
+%%
+int yywrap() {
+    return 1;
+}
+
+ss_yacc.y
+
+%{
+	    #include<stdio.h>
+	    #include<string.h>
+	    #include<stdlib.h>
+	    #include<ctype.h>
+	    #include"lex.yy.c"
+	    
+	    void yyerror(const char *s);
+	    int yylex();
+	    int yywrap();
+%}
+	
+%token VOID CHARACTER PRINTF SCANF INT FLOAT CHAR FOR IF ELSE TRUE FALSE NUMBER FLOAT_NUM ID LE GE EQ NE GT LT AND OR STR ADD MULTIPLY DIVIDE SUBTRACT UNARY INCLUDE RETURN 
+	
+%%
+	
+	program: headers main '(' ')' '{' body return '}' { printf("program compiled successfully_no_of_lines %d\n",countn);}
+	;
+	
+	headers: headers headers
+	| INCLUDE
+	;
+	
+	main: datatype ID
+	;
+	
+	datatype: INT 
+	| FLOAT 
+	| CHAR
+	| VOID
+	;
+	
+	body: FOR '(' statement ';' condition ';' statement ')' '{' body '}'
+	| IF '(' condition ')' '{' body '}' else
+	| statement ';' 
+	| body body
+	| PRINTF '(' STR ',' ID ')' ';'
+        | PRINTF '(' STR ')' ';'
+	| SCANF '(' STR ',' '&' ID ')' ';'
+	;
+	
+	else: ELSE '{' body '}'
+	|
+	;
+	
+	condition: value relop value 
+	| TRUE 
+	| FALSE
+	;
+	
+	statement: datatype ID init 
+	| ID '=' expression 
+	| ID relop expression
+	| ID UNARY 
+	| UNARY ID
+	;
+	
+	init: '=' value 
+	|
+	;
+	
+	expression: expression arithmetic expression
+	| value
+	;
+	
+	arithmetic: ADD 
+	| SUBTRACT 
+	| MULTIPLY
+	| DIVIDE
+	;
+	
+	relop: LT
+	| GT
+	| LE
+	| GE
+	| EQ
+	| NE
+	;
+	
+	value: NUMBER
+	| FLOAT_NUM
+	| CHARACTER
+	| ID
+	;
+	
+	return: RETURN value ';' 
+	|
+	;
+	
+%%
+	
+	int main() {
+	    yyparse();
+	}
+	
+	void yyerror(const char* msg) {
+	    printf(" error - %s\n", msg);
+	}
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+THREE ADDRESS CODE
+
+qud.l
+
+%{ 
+    #include"y.tab.h" 
+    #include<stdio.h> 
+    #include<string.h> 
+    int LineNo=1; 
+%} 
+identifier [a-zA-Z_][_a-zA-Z0-9]* 
+number [0-9]+|([0-9]*\.[0-9]+) 
+%% 
+main\(\) return MAIN; 
+if return IF; 
+else return ELSE; 
+while return WHILE; 
+int | 
+char | 
+float return TYPE; 
+{identifier} {strcpy(yylval.var,yytext); return VAR;} 
+{number} {strcpy(yylval.var,yytext); return NUM;} 
+\< | 
+\> | 
+\>= | 
+\<= | 
+== {strcpy(yylval.var,yytext); return RELOP;} 
+[ \t] ; 
+\n LineNo++; 
+. return yytext[0]; 
+%%
+int yywrap(){
+    return 1;
+}
+
+qud.y
+
+%{ 
+    #include<string.h> 
+    #include<stdio.h> 
+    #include <stdlib.h>
+    struct quad 
+    { 
+        char op[5]; 
+        char arg1[10]; 
+        char arg2[10]; 
+        char result[10]; 
+    }QUAD[30]; 
+    struct stack 
+    { 
+        int items[100]; 
+        int top; 
+    }stk; 
+    int Index=0,tIndex=0,StNo,Ind,tInd;
+    extern int LineNo;
+    int yylex();
+   void yyerror();
+    void push(int data) 
+    { 
+        stk.top++; 
+        if(stk.top==100) 
+        { 
+            printf("\n Stack overflow\n"); 
+            exit(0); 
+        } 
+        stk.items[stk.top]=data; 
+    } 
+    int pop() 
+    { 
+        int data; 
+        if(stk.top==-1) 
+        { 
+            printf("\n Stack underflow\n"); 
+            exit(0); 
+        } 
+        data=stk.items[stk.top--]; 
+        return data; 
+    } 
+
+    void AddQuadruple(char op[5],char arg1[10],char arg2[10],char result[10]) 
+    { 
+        strcpy(QUAD[Index].op,op); 
+        strcpy(QUAD[Index].arg1,arg1); 
+        strcpy(QUAD[Index].arg2,arg2); 
+        sprintf(QUAD[Index].result,"t%d",tIndex++); 
+        strcpy(result,QUAD[Index++].result); 
+    } 
+%} 
+%union 
+{ 
+    char var[10]; 
+} 
+%token <var> NUM VAR RELOP 
+%token MAIN IF ELSE WHILE TYPE 
+%type <var> EXPR ASSIGNMENT CONDITION IFST ELSEST WHILELOOP 
+%left '-' '+' 
+%left '*' '/' 
+%% 
+PROGRAM : MAIN BLOCK 
+        ; 
+
+BLOCK : '{' CODE '}' 
+     ; 
+
+CODE : BLOCK 
+     | STATEMENT CODE 
+     | STATEMENT 
+     ; 
+
+STATEMENT : DESCT ';' 
+          | ASSIGNMENT ';' 
+          | CONDST 
+          | WHILEST 
+          ; 
+
+DESCT : TYPE VARLIST 
+      ; 
+VARLIST : VAR ',' VARLIST 
+        | VAR 
+        ; 
+ASSIGNMENT : VAR '=' EXPR { 
+    strcpy(QUAD[Index].op,"="); 
+    strcpy(QUAD[Index].arg1,$3); 
+    strcpy(QUAD[Index].arg2,""); 
+    strcpy(QUAD[Index].result,$1); 
+    strcpy($$,QUAD[Index++].result);
+    printf("assignment\n");
+} 
+           ; 
+EXPR : EXPR '+' EXPR {AddQuadruple("+",$1,$3,$$);} 
+     | EXPR '-' EXPR {AddQuadruple("-",$1,$3,$$);} 
+     | EXPR '*' EXPR {AddQuadruple("*",$1,$3,$$);} 
+     | EXPR '/' EXPR {AddQuadruple("/",$1,$3,$$);} 
+     | '-' EXPR { AddQuadruple("UMIN",$2,"",$$);} 
+     | '(' EXPR ')' {strcpy($$,$2);} 
+     | VAR 
+     | NUM 
+     ; 
+
+CONDST : IFST{ 
+    Ind=pop(); 
+    sprintf(QUAD[Ind].result,"%d",Index); 
+    Ind=pop(); 
+    sprintf(QUAD[Ind].result,"%d",Index);
+    printf("condst\n");
+} 
+| IFST ELSEST 
+; 
+IFST : IF '(' CONDITION ')' { 
+    strcpy(QUAD[Index].op,"=="); 
+    strcpy(QUAD[Index].arg1,$3); 
+    strcpy(QUAD[Index].arg2,"FALSE"); 
+    strcpy(QUAD[Index].result,"-1"); 
+    push(Index); 
+    Index++;
+    printf("ifst\n");
+} 
+BLOCK { 
+strcpy(QUAD[Index].op,"GOTO"); 
+strcpy(QUAD[Index].arg1,""); 
+strcpy(QUAD[Index].arg2,""); 
+strcpy(QUAD[Index].result,"-1"); 
+push(Index); 
+Index++; 
+    printf("ifst block\n");
+}; 
+ELSEST : ELSE{ 
+tInd=pop(); 
+Ind=pop(); 
+push(tInd); 
+sprintf(QUAD[Ind].result,"%d",Index); 
+    printf("elsest\n");
+} 
+BLOCK{ 
+Ind=pop(); 
+sprintf(QUAD[Ind].result,"%d",Index);
+    printf("elsest block\n");
+}; 
+CONDITION : VAR RELOP VAR {AddQuadruple($2,$1,$3,$$); 
+StNo=Index-1; 
+    printf("condition\n");
+} 
+| VAR 
+| NUM 
+; 
+WHILEST : WHILELOOP{ 
+Ind=pop(); 
+sprintf(QUAD[Ind].result,"%d",StNo); 
+Ind=pop(); 
+sprintf(QUAD[Ind].result,"%d",Index); 
+    printf("whilest\n");
+} 
+; 
+WHILELOOP : WHILE '(' CONDITION ')' { 
+strcpy(QUAD[Index].op,"=="); 
+strcpy(QUAD[Index].arg1,$3); 
+strcpy(QUAD[Index].arg2,"FALSE"); 
+strcpy(QUAD[Index].result,"-1"); 
+push(Index); 
+Index++; 
+    printf("while loop\n");
+} 
+BLOCK { 
+strcpy(QUAD[Index].op,"GOTO"); 
+strcpy(QUAD[Index].arg1,""); 
+strcpy(QUAD[Index].arg2,""); 
+strcpy(QUAD[Index].result,"-1"); 
+push(Index); 
+Index++; 
+    printf("while loop block\n");
+} 
+; 
+%%
+#include "lex.yy.c"
+extern FILE *yyin; 
+int main(int argc,char **argv) 
+{ 
+    FILE *fp; 
+    int i; 
+    if(argc>1) 
+    { 
+        fp=fopen(argv[1],"r"); 
+        if(!fp) 
+        { 
+            printf("\n File not found"); 
+            exit(0); 
+        } 
+        yyin=fp; 
+    }
+    printf("File is read\n");
+    yyparse(); 
+    printf("Parsing is done\n");
+    printf("\n\t\t Pos Operator Arg1 Arg2 Result\n\t\t --------------------"); 
+    for(i=0;i<Index;i++) 
+    { 
+        printf("\n\t\t %d\t %s\t %s\t %s\t %s",i,QUAD[i].op,QUAD[i].arg1,QUAD[i].arg2,QUAD[i].result); 
+    } 
+    printf("\n\t\t -----------------------"); 
+    printf("\n\n"); 
+    return 0; 
+}
+
+
+
+void yyerror() 
+{ 
+    printf("\n Error on line no:%d",LineNo); 
+} 
+
+Three_addr_grammar.rtf
+
+PROGRAM        -->  MAIN BLOCK  
+BLOCK           -->  '{' CODE '}' 
+CODE             -->   BLOCK | STATEMENT CODE | STATEMENT 
+STATEMENT       -->   DESCT ';' | ASSIGNMENT ';' | CONDST | WHILEST 
+DESCT           -->   TYPE VARLIST 
+VARLIST          -->    VAR ',' VARLIST | VAR 
+ASSIGNMENT      --> VAR '=' EXPR
+EXPR                -->  EXPR '+' EXPR 
+                               | EXPR '-' EXPR 
+                               | EXPR '*' EXPR 
+                               | EXPR '/' EXPR 
+                               | '-' EXPR 
+                               | '(' EXPR ')' 
+                               | VAR 
+                               | NUM 
+CONDST         -->  IFST | IFST ELSEST 
+IFST             -->  IF '(' CONDITION ')' BLOCK 
+ELSEST           -->  ELSE BLOCK
+CONDITION       -->  VAR RELOP VAR | VAR | NUM 
+WHILEST        --> WHILELOOP
+WHILELOOP      -->  WHILE '(' CONDITION ')'  BLOCK 
+
+three_lex.txt
+
+%{ 
+#include"y.tab.h" 
+#include<stdio.h> 
+#include<string.h> 
+int LineNo=1; 
+% } 
+identifier [a-zA-Z][_a-zA-Z0-9]* 
+number [0-9]+|([0-9]*\.[0-9]+) 
+%% 
+main\(\) return MAIN; 
+if return IF; 
+else return ELSE; 
+while return WHILE; 
+int | 
+char | 
+float return TYPE; 
+{identifier} {strcpy(yylval.var,yytext); 
+return VAR;} 
+{number} {strcpy(yylval.var,yytext); 
+return NUM;} 
+\< | 
+\> | 
+\>= | 
+\<= | 
+== {strcpy(yylval.var,yytext); return RELOP;} 
+[ \t] ; 
+\n LineNo++; 
+. return yytext[0]; 
+%% 
+<int.y> 
+%{ 
+#include<string.h> 
+#include<stdio.h> 
+struct quad 
+{ 
+char op[5]; 
+char arg1[10]; 
+char arg2[10]; 
+char result[10]; 
+
+three_yacc.rtf
+
+<int.y> 
+%{ 
+#include<string.h> 
+#include<stdio.h> 
+struct quad 
+{ 
+char op[5]; 
+char arg1[10]; 
+char arg2[10]; 
+char result[10]; 
+}QUAD[30]; 
+struct stack 
+{ 
+int items[100]; 
+int top; 
+}stk; 
+int Index=0,tIndex=0,StNo,Ind,tInd; 
+extern int LineNo; 
+%} 
+%union 
+{ 
+char var[10]; 
+} 
+%token <var> NUM VAR RELOP 
+%token MAIN IF ELSE WHILE TYPE 
+%type <var> EXPR ASSIGNMENT CONDITION IFST ELSEST WHILELOOP 
+%left '-' '+' 
+%left '*' '/' 
+%% 
+PROGRAM : MAIN BLOCK 
+; 
+BLOCK: '{' CODE '}' 
+; 
+CODE: BLOCK 
+| STATEMENT CODE 
+| STATEMENT 
+; 
+STATEMENT: DESCT ';' 
+| ASSIGNMENT ';' 
+| CONDST 
+| WHILEST 
+; 
+DESCT: TYPE VARLIST 
+; 
+VARLIST: VAR ',' VARLIST 
+| VAR 
+; 
+ASSIGNMENT: VAR '=' EXPR{ 
+strcpy(QUAD[Index].op,"="); 
+strcpy(QUAD[Index].arg1,$3); 
+strcpy(QUAD[Index].arg2,""); 
+strcpy(QUAD[Index].result,$1); 
+strcpy($$,QUAD[Index++].result); 
+} 
+; 
+EXPR: EXPR '+' EXPR {AddQuadruple("+",$1,$3,$$);} 
+| EXPR '-' EXPR {AddQuadruple("-",$1,$3,$$);} 
+| EXPR '*' EXPR { AddQuadruple("*",$1,$3,$$);} 
+| EXPR '/' EXPR { AddQuadruple("/",$1,$3,$$);} 
+| '-' EXPR { AddQuadruple("UMIN",$2,"",$$);} 
+| '(' EXPR ')' {strcpy($$,$2);} 
+| VAR 
+| NUM 
+; 
+CONDST: IFST{ 
+Ind=pop(); 
+sprintf(QUAD[Ind].result,"%d",Index); 
+Ind=pop(); 
+sprintf(QUAD[Ind].result,"%d",Index); 
+} 
+| IFST ELSEST 
+; 
+IFST: IF '(' CONDITION ')' { 
+strcpy(QUAD[Index].op,"=="); 
+strcpy(QUAD[Index].arg1,$3); 
+strcpy(QUAD[Index].arg2,"FALSE"); 
+strcpy(QUAD[Index].result,"-1"); 
+push(Index); 
+Index++; 
+} 
+BLOCK { 
+strcpy(QUAD[Index].op,"GOTO"); 
+strcpy(QUAD[Index].arg1,""); 
+strcpy(QUAD[Index].arg2,""); 
+strcpy(QUAD[Index].result,"-1"); 
+push(Index); 
+Index++; 
+}; 
+ELSEST: ELSE{ 
+tInd=pop(); 
+Ind=pop(); 
+push(tInd); 
+sprintf(QUAD[Ind].result,"%d",Index); 
+} 
+BLOCK{ 
+Ind=pop(); 
+sprintf(QUAD[Ind].result,"%d",Index); 
+}; 
+CONDITION: VAR RELOP VAR {AddQuadruple($2,$1,$3,$$); 
+StNo=Index-1; 
+} 
+| VAR 
+| NUM 
+; 
+WHILEST: WHILELOOP{ 
+Ind=pop(); 
+sprintf(QUAD[Ind].result,"%d",StNo); 
+Ind=pop(); 
+sprintf(QUAD[Ind].result,"%d",Index); 
+} 
+; 
+WHILELOOP: WHILE '(' CONDITION ')' { 
+strcpy(QUAD[Index].op,"=="); 
+strcpy(QUAD[Index].arg1,$3); 
+strcpy(QUAD[Index].arg2,"FALSE"); 
+strcpy(QUAD[Index].result,"-1"); 
+push(Index); 
+Index++; 
+} 
+BLOCK { 
+strcpy(QUAD[Index].op,"GOTO"); 
+strcpy(QUAD[Index].arg1,""); 
+strcpy(QUAD[Index].arg2,""); 
+strcpy(QUAD[Index].result,"-1"); 
+push(Index); 
+Index++; 
+} 
+; 
+%% 
+extern FILE *yyin; 
+int main(int argc,char *argv[]) 
+{ 
+FILE *fp; 
+int i; 
+if(argc>1) 
+{ 
+fp=fopen(argv[1],"r"); 
+if(!fp) 
+{ 
+printf("\n File not found"); 
+exit(0); 
+} 
+yyin=fp; 
+} 
+yyparse(); 
+printf("\n\n\t\t ----------------------------""\n\t\t Pos Operator Arg1 Arg2 Result" "\n\t\t 
+--------------------"); 
+for(i=0;i<Index;i++) 
+{ 
+printf("\n\t\t %d\t %s\t %s\t %s\t 
+%s",i,QUAD[i].op,QUAD[i].arg1,QUAD[i].arg2,QUAD[i].result); 
+} 
+printf("\n\t\t -----------------------"); 
+printf("\n\n"); 
+return 0; 
+} 
+void push(int data) 
+{ 
+stk.top++; 
+if(stk.top==100) 
+{ 
+printf("\n Stack overflow\n"); 
+exit(0); 
+} 
+stk.items[stk.top]=data; 
+} 
+int pop() 
+{ 
+int data; 
+if(stk.top==-1) 
+{ 
+printf("\n Stack underflow\n"); 
+exit(0); 
+} 
+data=stk.items[stk.top--]; 
+return data; 
+} 
+void AddQuadruple(char op[5],char arg1[10],char arg2[10],char result[10]) 
+{ 
+strcpy(QUAD[Index].op,op); 
+strcpy(QUAD[Index].arg1,arg1); 
+strcpy(QUAD[Index].arg2,arg2); 
+sprintf(QUAD[Index].result,"t%d",tIndex++); 
+strcpy(result,QUAD[Index++].result); 
+} 
+yyerror() 
+{ 
+printf("\n Error on line no:%d",LineNo); 
+} 
+
+input Program
+main() 
+{ 
+int a,b,c; 
+if(a<b) 
+{ 
+a=a+b; 
+} 
+while(a<b) 
+{ 
+a=a+b; 
+} 
+if(a<=b) 
+{ 
+c=a-b; 
+} 
+else 
+{ 
+c=a+b; 
+} 
+} 
+
+three.l
+
+%{
+   #include "y.tab.h"
+   char yylval;
+%}
+%%
+[0-9]+ {yylval=yytext[0]; return digit;}
+[\t] ;
+[\n] return 0;
+.    return yytext[0];
+%%
+int yywrap()
+{
+return 0;
+}
+
+three.y
+
+%{
+/* Definition section */
+   #include<ctype.h>
+
+   #include<stdio.h>
+   #include<stdlib.h>
+   #include<math.h>
+   #define YYSTYPE char
+
+   int yylex();
+   void yyerror();
+   char p='A'-1;  
+%}
+
+%token digit
+%%
+S : E {printf("\n x = %c \n",$$);}
+  ;
+E : E '+' T  {p++; printf("\n %c = %c + %c",p,$1,$3);$$=p;}
+  | E '-' T  {p++; printf("\n %c = %c - %c",p,$1,$3);$$=p;}
+  | T
+  ;
+T : T '*' P  {p++; printf("\n %c = %c * %c",p,$1,$3);$$=p;}
+  | T '/' P  {p++; printf("\n %c = %c / %c",p,$1,$3);$$=p;}
+  | P
+  ;
+P : F '^' P  {p++; printf("\n %c = %c ^ %c",p,$1,$3);$$=p;}
+  | F
+  ;
+F : '(' E ')' {$$=p;}
+  | digit
+  ;
+%%
+#include"lex.yy.c"
+int main()
+{
+printf("Enter infix expression: ");
+yyparse();
+}
+void yyerror()
+{
+printf(" Errorn Expression\n");
+}
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
